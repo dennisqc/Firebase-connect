@@ -1,78 +1,65 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
-class StreamPage extends StatelessWidget {
-  // const StreamPage({super.key});
+class StreamPage extends StatefulWidget {
+  const StreamPage({super.key});
 
-  CollectionReference userReference =
-      FirebaseFirestore.instance.collection("users");
-  Stream<int> counter() async* {
-    for (int i = 0; i < 10; i++) {
-      yield i;
-      await Future.delayed(Duration(seconds: 1));
-    }
+  @override
+  State<StreamPage> createState() => _StreamPageState();
+}
+
+class _StreamPageState extends State<StreamPage> {
+  Future<String> getData() async {
+    await Future.delayed(Duration(seconds: 5));
+    return "Esta es la data";
   }
 
-  Future<int> getNumber() async {
-    return 10;
+  StreamController<String> streamController = StreamController();
+  @override
+  void initState() {
+    print("creando stream controller");
+    streamController.stream.listen(
+      (data) {
+        print("Dataa recibida_ $data");
+      },
+      onDone: () => print("doneee"),
+    );
+    streamController.add("Este es el evento");
+    print("Finnish");
+    super.initState();
   }
 
   @override
-  Widget build(BuildContext context) {
-    // getNumber().then((value) {
-    //   print(value);
-    // });
-    // counter().listen((event) {
-    //   print(event);
-    // });
+  void dispose() {
+    streamController.close();
+    super.dispose();
+  }
+  // @override
+  // void initState() {
+  //   print("inicio del String");
+  //   Stream<String> myStream = Stream.fromFuture(getData());
+  //   print("Stream creado");
+  //   myStream.listen(
+  //     (data) {
+  //       print("la data es $data");
+  //     },
+  //     onDone: () {
+  //       print("Taks Done");
+  //     },
+  //     // onError: () {
+  //     //   print("hay un error");
+  //     // },
+  //   );
+  //   print("finish");
+  //   super.initState();
+  // }
 
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text("data"),
-        ),
-        body: StreamBuilder(
-            stream: userReference.snapshots(),
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if (snapshot.hasData) {
-                QuerySnapshot userCollection = snapshot.data;
-                print(userCollection.size);
-              }
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }),
-        // StreamBuilder(
-        //   stream: counter(),
-        //   // initialData: initialData,
-        //   builder: (BuildContext context, AsyncSnapshot snapshot) {
-        //     if (snapshot.hasData) {
-        //       return Center(
-        //         child: Text(
-        //           snapshot.data.toString(),
-        //           style: TextStyle(fontSize: 50),
-        //         ),
-        //       );
-        //     }
-        //     return Center(
-        //       child: CircularProgressIndicator(),
-        //     );
-        //   },
-        // ),
-        // FutureBuilder(
-        //   future: getNumber(),
-        //   builder: (context, snap) {
-        //     if (snap.hasData) {
-        //       return Text(
-        //         snap.data.toString(),
-        //         style: TextStyle(fontSize: 50),
-        //       );
-        //     }
-        //     return Center(
-        //       child: CircularProgressIndicator(),
-        //     );
-        //   },
-        // ),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Stream PAge"),
       ),
     );
   }
